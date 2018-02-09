@@ -2,52 +2,75 @@
 #include <string>
 #include <vector>
 
-std::vector< std::string > evaluateArguments( int const & argc, char const * const argv[] )
+#include "TextFileForInput.h"
+#include "TextFileForOutput.h"
+
+bool argumentsExist( int const & argc, char const * const * const & argv );
+void reportAnyErrors( int const & argc, char const * const * const & argv );
+void runProgram( int const & argc, char const * const * const & argv );
+std::vector< std::string > convert( char const * const * const & argv );
+void loadInput( std::string const & fileName );
+void process();
+void saveResults( std::string const & fileName );
+
+int main( int argc, char * argv[] )
 {
-    std::vector< std::string > fileNames;
+    if ( ! argumentsExist( argc, argv ) )
+        return 1;
 
-    if ( argc > 0 )
-        fileNames.push_back( argv[ 0 ] );
+    runProgram( argc, argv );
+    return 0;
+}
 
-    if ( argc > 1 )
-        fileNames.push_back( argv[ 1 ] );
+bool argumentsExist( int const & argc, char const * const * const & argv )
+{
+    if ( argc >= 3 )
+        return true;
 
-    if ( argc > 2 )
-        fileNames.push_back( argv[ 2 ] );
+    reportAnyErrors( argc, argv );
+    return false;
+}
 
+void reportAnyErrors( int const & argc, char const * const * const & argv )
+{
     if ( argc == 2 )
         std::cout << "syntax: " << argv[0] << " " << argv[1] << " <output file name>" << std::endl;
 
     if ( argc == 1 )
         std::cout << "syntax: " << argv[0] << " <input file name> <output file name>" << std::endl;
+}
 
+void runProgram( int const & argc, char const * const * const & argv )
+{
+    std::vector< std::string > fileNames = convert( argv );
+    loadInput( fileNames[ 0 ] );
+    process();
+    saveResults( fileNames[ 1 ] );
+}
+
+std::vector< std::string > convert( char const * const * const & argv )
+{
+    std::vector< std::string > fileNames;
+    fileNames.push_back( argv[ 1 ] );
+    fileNames.push_back( argv[ 2 ] );
     return fileNames;
 }
 
 void loadInput( std::string const & fileName )
 {
-    std::cout << "input: " << fileName << std::endl;
+    TextFileForInput file( fileName );
+    if ( ! file.isOpen() )
+        std::cout << "Error! Input file " << fileName << " is not open." << std::endl;
 }
 
-void generateResults()
+void process()
 {
 }
 
 void saveResults( std::string const & fileName )
 {
-    std::cout << "output: " << fileName << std::endl;
-}
-
-int main( int argc, char * argv[] )
-{
-    std::vector< std::string > fileNames = evaluateArguments( argc, argv );
-
-    if ( fileNames.size() < 3 )
-        return 1;
-
-    loadInput( fileNames[ 1 ] );
-    generateResults();
-    saveResults( fileNames[ 2 ] );
-    return 0;
+    TextFileForOutput file( fileName );
+    if ( ! file.isOpen() )
+        std::cout << "Error! Output file " << fileName << " is not open." << std::endl;
 }
 

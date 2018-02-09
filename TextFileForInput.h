@@ -1,7 +1,7 @@
 #ifndef TEXT_FILE_FOR_INPUT_H
 #define TEXT_FILE_FOR_INPUT_H
 
-#include <ifstream>
+#include <fstream>
 #include <string>
 
 class TextFileForInput
@@ -23,6 +23,7 @@ public:
     }
 
 private:
+    TextFileForInput(); // prevent default construction
     std::ifstream file;
 };
 
